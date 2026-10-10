@@ -22,6 +22,9 @@ Each file's SHA-256 is listed in `frozen/SHA256SUMS`, and the commit time on Git
   trading through the weekend, so this is labelled "at Friday's close" and is not the week's result.
 - **Monday:** the week's own close (Sunday 24:00 UTC), against the frozen band.
 
+`rehearsal/` holds pipeline tests computed **after** their week. They are never a freeze and never scored. The record in `frozen/`
+starts with the week of 12 Oct 2026.
+
 Nothing is re-scored or back-filled. A week whose freeze missed its deadline is not scored, and says so.
 
 edgewise.to

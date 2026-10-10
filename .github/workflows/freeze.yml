@@ -1,0 +1,66 @@
+# Publishes Bitcoin's frozen week read: fetched from the Edgewise server's public, immutable endpoint, checked
+# against its sha256, written to frozen/<monday>_btc.json with its SHA256SUMS line, committed. Never overwrites.
+name: weekly freeze
+on:
+  schedule:
+    - cron: "2 0 * * 1"           # Monday 00:02 UTC (the server freezes at 00:01); GitHub drift lands it by ~00:35
+  workflow_dispatch:
+    inputs:
+      monday:
+        description: "Monday (YYYY-MM-DD); default: this week's"
+        required: false
+      rehearsal:
+        description: "Fetch the server's labelled rehearsal into rehearsal/ (computed after its week; never frozen/)"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: weekly-freeze
+  cancel-in-progress: false
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch, check, record
+        env:
+          MONDAY_IN: ${{ inputs.monday }}
+          REHEARSAL: ${{ inputs.rehearsal && 'true' || 'false' }}
+        run: |
+          set -euo pipefail
+          if [ "$REHEARSAL" = "true" ]; then
+            URL="https://edgewise.to/api/weekly-freeze/BTC/rehearsal"; DIR="rehearsal"
+          else
+            MONDAY="${MONDAY_IN:-$(date -u -d "today - $(( $(date -u +%u) - 1 )) days" +%F)}"
+            URL="https://edgewise.to/api/weekly-freeze/BTC/${MONDAY}"; DIR="frozen"
+          fi
+          mkdir -p "$DIR"
+          curl -fsS --retry 5 --retry-delay 30 -D headers.txt -o body.json "$URL"
+          MONDAY=$(python3 -c "import json; print(json.load(open('body.json'))['week'])")
+          NAME="${MONDAY}_btc.json"; DST="${DIR}/${NAME}"
+          echo "week ${MONDAY} -> ${DST}"
+          if [ -e "$DST" ]; then echo "ALREADY RECORDED: ${DST} exists; nothing overwritten"; exit 0; fi
+          GOT=$(sha256sum body.json | cut -d' ' -f1)
+          SAID=$(grep -i '^x-sha256:' headers.txt | tr -d '\r' | awk '{print $2}' || true)
+          if [ -n "$SAID" ] && [ "$SAID" != "$GOT" ]; then echo "SHA MISMATCH: server says ${SAID}, body is ${GOT}"; exit 1; fi
+          python3 - "$DIR" <<'PY'
+          import json, sys
+          d = json.load(open("body.json")); m = d["markets"]
+          assert list(m) == ["BTC"], list(m)
+          assert all(set(c) == {"week"} for c in m["BTC"].get("closest", [])), "closest: dates only"
+          assert "/Users" not in json.dumps(d), "a local path in a public file"
+          # a file computed after its week is a rehearsal and only ever goes to rehearsal/
+          assert d.get("rehearsal") is (sys.argv[1] == "rehearsal"), f"rehearsal flag {d.get('rehearsal')} vs folder {sys.argv[1]}"
+          PY
+          mv body.json "$DST"; echo "${GOT}  ${NAME}" >> "${DIR}/SHA256SUMS"
+          git config user.name "edgewise-weekly"; git config user.email "edgewise-weekly@users.noreply.github.com"
+          MSG="freeze ${MONDAY}: BTC week read at the open, sha256 ${GOT}"
+          [ "$DIR" = "rehearsal" ] && MSG="rehearsal ${MONDAY}: computed AFTER its week to prove the pipeline, never a freeze; sha256 ${GOT}"
+          git add "$DIR"; git commit -m "$MSG"
+          if ! git push; then                         # someone recorded meanwhile: theirs stands, never overwritten
+            git fetch origin main
+            if git cat-file -e "origin/main:${DST}" 2>/dev/null; then git reset --hard origin/main; echo "ALREADY RECORDED (raced): ${DST}"; exit 0; fi
+            git rebase origin/main && git push
+          fi
+          echo "PUBLISHED ${NAME} ${GOT} at $(date -u +%FT%TZ)"
