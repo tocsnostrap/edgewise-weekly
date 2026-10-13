@@ -54,6 +54,11 @@ jobs:
           assert d.get("rehearsal") is (sys.argv[1] == "rehearsal"), f"rehearsal flag {d.get('rehearsal')} vs folder {sys.argv[1]}"
           PY
           mv body.json "$DST"; echo "${GOT}  ${NAME}" >> "${DIR}/SHA256SUMS"
+          if [ "$DIR" = "frozen" ]; then              # the server's OpenTimestamps proof, stamped at its 00:01 freeze; copied, never made here
+            if curl -fsS --retry 3 --retry-delay 20 -o proof.ots "https://edgewise.to/api/weekly-freeze/BTC/${MONDAY}/ots" \
+               && python3 scripts/ots_digest.py proof.ots "$GOT"; then mv proof.ots "${DST}.ots"; echo "proof: ${DST}.ots"
+            else echo "NO PROOF: the server's /ots was missing or not for this file; the JSON is recorded without one"; rm -f proof.ots; fi
+          fi
           git config user.name "edgewise-weekly"; git config user.email "edgewise-weekly@users.noreply.github.com"
           MSG="freeze ${MONDAY}: BTC week read at the open, sha256 ${GOT}"
           [ "$DIR" = "rehearsal" ] && MSG="rehearsal ${MONDAY}: computed AFTER its week to prove the pipeline, never a freeze; sha256 ${GOT}"

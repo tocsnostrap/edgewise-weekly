@@ -34,14 +34,24 @@ jobs:
           echo "week ${MONDAY}"
           if [[ "$MONDAY" < "2026-10-19" ]]; then echo "SKIP: proofs start with the week of 19 Oct; none is made after the fact"; exit 0; fi
           if [ ! -e "$F" ]; then echo "SKIP: ${F} is not in the repo"; exit 0; fi
-          if [ ! -e "$P" ]; then echo "SKIP: no proof was published with ${F}; none is made now"; exit 0; fi
+          COPIED=0
+          if [ ! -e "$P" ]; then                       # copy the server's proof (stamped at its 00:01 freeze), never make one
+            GOT=$(sha256sum "$F" | cut -d' ' -f1)
+            if curl -fsS --retry 3 --retry-delay 20 -o "$P" "https://edgewise.to/api/weekly-freeze/BTC/${MONDAY}/ots" \
+               && python3 scripts/ots_digest.py "$P" "$GOT"; then COPIED=1; echo "proof copied from the server: ${P}"
+            else rm -f "$P"; echo "SKIP: no server proof for ${F}; none is made now"; exit 0; fi
+          fi
           pip install -q opentimestamps-client==0.7.2 || { echo "FAIL: could not install the client; proof left as it is"; exit 1; }
           cp "$P" work.ots
           ots --no-bitcoin upgrade work.ots || true          # talks to the calendars only; a pending result is normal
           rc=0; python3 scripts/ots_check.py "$F" work.ots || rc=$?
-          if [ $rc -eq 2 ]; then echo "PENDING: no Bitcoin attestation yet; proof left as it is"; exit 0; fi
-          if [ $rc -ne 0 ]; then echo "FAIL: the upgraded proof did not check; proof left as it is"; exit 1; fi
-          if cmp -s work.ots "$P"; then echo "ALREADY UPGRADED: nothing to commit"; exit 0; fi
-          mv work.ots "$P"
           git config user.name "edgewise-weekly"; git config user.email "edgewise-weekly@users.noreply.github.com"
+          if [ $rc -eq 2 ]; then
+            echo "PENDING: no Bitcoin attestation yet; proof left as it is"
+            if [ $COPIED = 1 ]; then git add "$P" && git commit -m "ots ${MONDAY}: the server's pending proof for ${F} (stamped at the freeze; digest checked)" && git push; fi
+            exit 0
+          fi
+          if [ $rc -ne 0 ]; then echo "FAIL: the upgraded proof did not check; proof left as it is"; [ $COPIED = 1 ] && rm -f "$P"; exit 1; fi
+          if [ $COPIED = 0 ] && cmp -s work.ots "$P"; then echo "ALREADY UPGRADED: nothing to commit"; exit 0; fi
+          mv work.ots "$P"
           git add "$P" && git commit -m "ots ${MONDAY}: proof upgraded and checked against ${F} and the Bitcoin chain" && git push
