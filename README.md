@@ -28,3 +28,9 @@ starts with the week of 12 Oct 2026.
 Nothing is re-scored or back-filled. A week whose freeze missed its deadline is not scored, and says so.
 
 edgewise.to
+
+## Weekly pick (from 2026-10-12)
+
+Each Monday at 10:00 UTC we take the app's top closest-match week as that week's pick and post it. The scored pick is `picks/<monday>.json`, with its SHA-256 in `picks/SHA256SUMS`.
+
+- 2026-10-13: the freeze's `closest` field before 2026-10-19 was matched on no closed bars and isn't used; the scored pick is `picks/<monday>.json`. The 2026-10-12 pick was posted on X on Mon 12 Oct 11:06 UTC and added here on Tue 13 Oct. Published freezes are never edited.

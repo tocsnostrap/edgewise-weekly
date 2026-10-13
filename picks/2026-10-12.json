@@ -1,0 +1,137 @@
+{
+ "week": "2026-10-12",
+ "market": "BTC",
+ "at": "2026-10-12T10:00:00+00:00",
+ "last_bar_used": "2026-10-12 08:00:00+00:00",
+ "method": "the app's closest matches (fractal, 4h bars) at Monday 10:00 UTC; the pick is the top match",
+ "pick": {
+  "iso": "2025-10-13",
+  "label": "13 Oct '25",
+  "match_pct": 95,
+  "dir": "down"
+ },
+ "matches": [
+  {
+   "iso": "2025-10-13",
+   "match_pct": 95,
+   "dir": "down"
+  },
+  {
+   "iso": "2025-09-15",
+   "match_pct": 94,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-07-27",
+   "match_pct": 94,
+   "dir": "down"
+  },
+  {
+   "iso": "2025-09-29",
+   "match_pct": 93,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-10-05",
+   "match_pct": 92,
+   "dir": "down"
+  },
+  {
+   "iso": "2025-07-28",
+   "match_pct": 92,
+   "dir": "down"
+  },
+  {
+   "iso": "2025-07-07",
+   "match_pct": 92,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-05-25",
+   "match_pct": 92,
+   "dir": "down"
+  },
+  {
+   "iso": "2026-06-08",
+   "match_pct": 91,
+   "dir": "up"
+  },
+  {
+   "iso": "2025-08-04",
+   "match_pct": 90,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-08-10",
+   "match_pct": 90,
+   "dir": "down"
+  },
+  {
+   "iso": "2026-04-13",
+   "match_pct": 90,
+   "dir": "up"
+  },
+  {
+   "iso": "2025-11-24",
+   "match_pct": 89,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-02-16",
+   "match_pct": 89,
+   "dir": "down"
+  },
+  {
+   "iso": "2026-01-12",
+   "match_pct": 89,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-05-18",
+   "match_pct": 89,
+   "dir": "down"
+  },
+  {
+   "iso": "2025-09-08",
+   "match_pct": 88,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-04-06",
+   "match_pct": 86,
+   "dir": "up"
+  },
+  {
+   "iso": "2025-06-30",
+   "match_pct": 86,
+   "dir": "up"
+  },
+  {
+   "iso": "2025-06-23",
+   "match_pct": 86,
+   "dir": "up"
+  },
+  {
+   "iso": "2025-10-06",
+   "match_pct": 85,
+   "dir": "down"
+  },
+  {
+   "iso": "2026-08-31",
+   "match_pct": 85,
+   "dir": "up"
+  },
+  {
+   "iso": "2026-06-15",
+   "match_pct": 84,
+   "dir": "down"
+  },
+  {
+   "iso": "2025-09-01",
+   "match_pct": 84,
+   "dir": "up"
+  }
+ ],
+ "posted": "x.com/Edgewise_to, Mon 12 Oct 2026 11:06 UTC",
+ "note": "dates and match scores only; the pick's path is re-drawn from its date at scoring time. match_pct = how similar the weeks' first hours were, not a chance."
+}
