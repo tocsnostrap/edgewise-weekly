@@ -8,8 +8,9 @@ nothing was changed afterwards.
 
 - **00:05**: Bitcoin's week band, as the Edgewise app shows it at the week's open. It is the middle 20 / 40 / 60 / 80%
   of where Bitcoin's last 104 weeks closed, measured from the open, at every hour of the week.
-  Over 248 tested weeks, Bitcoin closed inside the 80% band 83% of the time. That means a miss about one week in five,
-  and two in a row do happen.
+  We tested this weekly range, set at Monday's open, on almost 5 years of past Bitcoin weeks. Bitcoin finished the week
+  inside it about 5 weeks in 6. So about 1 week in 6 it ends outside, and that can happen two weeks in a row.
+  (R&D's registered wording since 14 Oct 2026; the measured figure is 83.1% over 248 weeks.)
 - **08:05**: the app's closest matching week (its "% similar" score and its candles plotted forward). This is one past
   week, not a forecast. "Similar" means the week's first hours moved like this week's. It is never scored as a
   prediction; Saturday simply shows how far it finished from the real week.
